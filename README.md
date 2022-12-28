@@ -53,6 +53,7 @@ WTCHG_626197_296189_.genes.results<br/>
 
 *R code for DE analysis:*<br/>
 RNA-seq project.Rmd<br/>
+RNA-seq-project.html<br/>
 
 *Pathway analysis with Reactome:*<br/>
 reactome_result.csv<br/>
