@@ -4,9 +4,8 @@ Author: Migle Apanaviciute
 
 Date: 28/12/2022
 
-**About Data**/
-RNA-seq data from Human HGSC (high grade serous ovarian cancer) cell line - OVCAR4.  
-Data split into 2 groups (3 samples each): carboplatin-resistant vs carboplatin-sensitive
+**About Data**:
+RNA-seq data from Human HGSC (high grade serous ovarian cancer) cell line - OVCAR4. Data split into 2 groups (3 samples each): carboplatin-resistant vs carboplatin-sensitive
 
 Data Sets:
 Libraries were sequenced to a target coverage of 50 × on Illumina's HiSeq 4000 (2 x 75 bp paired end reads)
