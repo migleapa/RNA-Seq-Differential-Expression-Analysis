@@ -14,10 +14,10 @@ Libraries were sequenced to a target coverage of 50 × on Illumina's HiSeq 4000 
 Investigate the changes in gene expression and effects on Gene Ontology Biological Pathways (GOBP) in carboplatin-resistant samples compared to carboplatin-sensitive.
 
 **Bioinformatics Pipeline**:
-Bash:
-/Running QC on FASTQ files
-/Adapter trimming using trim_galore
-/Mapping to the human genome (hg38, Genome Reference Consortium GRCh38) using STAR
+Bash:<br/>
+Running QC on FASTQ files<br/>
+Adapter trimming using trim_galore<br/>
+Mapping to the human genome (hg38, Genome Reference Consortium GRCh38) using STAR
 Quantification of gene abundance using rsem
 R:
 Generating matrix of the rsem estimated_counts 
