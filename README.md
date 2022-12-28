@@ -14,15 +14,16 @@ In total there were 12 raw FASTQ files (2 for each sample).
 Investigate the changes in gene expression and effects on Gene Ontology Biological Pathways (GOBP) in carboplatin-resistant samples compared to carboplatin-sensitive.
 
 **Bioinformatics Pipeline**:<br/>
+
 *Bash:*<br/>
 Running QC on FASTQ files.<br/>
 Adapter trimming using trim_galore.<br/>
 Mapping to the human genome (hg38, Genome Reference Consortium GRCh38) using STAR.<br/>
 Quantification of gene abundance using rsem.<br/>
+
 *R:*
 Generating matrix of the rsem estimated_counts.<br/>
 Filtering out low count genes (allowing 10 counts in at least 3 samples).<br/>
-To see relationship among two groups using unsupervised clustering: PCR and dendrogram.<br/>
 Differential Expression Analysis using DESeq2.<br/>
 Annotating using Ensembl annotation.<br/>
 Performing Pre-Ranked Gene Set Enrichment Analysis (GSEA Pre-Ranked) using Molecular Signatures Database (c5.go.bp.v7.4.symbols.gmt).<br/>
