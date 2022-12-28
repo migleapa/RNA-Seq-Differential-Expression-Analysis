@@ -21,7 +21,7 @@ Adapter trimming using trim_galore.<br/>
 Mapping to the human genome (hg38, Genome Reference Consortium GRCh38) using STAR.<br/>
 Quantification of gene abundance using rsem.<br/>
 
-*R:*
+*R:*<br/>
 Generating matrix of the rsem estimated_counts.<br/>
 Filtering out low count genes (allowing 10 counts in at least 3 samples).<br/>
 Differential Expression Analysis using DESeq2.<br/>
