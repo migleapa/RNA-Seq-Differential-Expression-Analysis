@@ -48,10 +48,10 @@ WTCHG_626197_289105_.genes.results<br/>
 WTCHG_626197_290117_.genes.results<br/>
 WTCHG_626197_291129_.genes.results<br/>
 WTCHG_626197_295177_.genes.results<br/>
-WTCHG_626197_296189_.genes.results
+WTCHG_626197_296189_.genes.results<br/>
 
-*R code for DE analysis:*
-RNA-seq project.Rmd
+*R code for DE analysis:*<br/>
+RNA-seq project.Rmd<br/>
 
 *Pathway analysis with Reactome:*<br/>
 reactome_result.csv<br/>
