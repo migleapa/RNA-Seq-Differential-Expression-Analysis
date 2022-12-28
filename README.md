@@ -1,8 +1,8 @@
 # RNA-seq-Differential-Expression-Analysis
 
-Author: Migle Apanaviciute
+**Author**: Migle Apanaviciute
 
-Date: 28/12/2022
+*Date: 28/12/2022*
 
 **About Data**:<br/>
 RNA-seq data from Human HGSC (high grade serous ovarian cancer) cell line - OVCAR4.<br/>
