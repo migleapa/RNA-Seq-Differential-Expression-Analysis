@@ -1,0 +1,363 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+ **Generating matrix of the rsem estimated_counts**
+
+```{r error = FALSE}
+# Loading results
+
+library(tidyverse)
+
+setwd("C:\\Users\\mapanavici\\RStudio\\R")
+
+Ov4Carbopool3 <- read.delim("WTCHG_626197_201106_.genes.results", header = TRUE)
+
+Ovcar4Parental1 <- read.delim("WTCHG_626197_289105_.genes.results", header = TRUE)
+
+Ovcar4Parental2 <- read.delim("WTCHG_626197_290117_.genes.results", header = TRUE)
+
+Ovcar4Parental3 <- read.delim("WTCHG_626197_291129_.genes.results", header = TRUE)
+
+Ov4Carbopool1 <- read.delim("WTCHG_626197_295177_.genes.results", header = TRUE)
+ 
+Ov4Carbopool2 <- read.delim("WTCHG_626197_296189_.genes.results", header = TRUE)
+
+```
+
+
+
+```{r}
+# Obtaining "gene_id" and "expected_count" columns, renaming "expected_count" column to individual sample.names
+
+get_counts <- function(sample_df) {
+  
+  id_and_counts <- select(sample_df, gene_id, expected_count)
+  names(id_and_counts)[2] <- deparse(substitute(sample_df))
+  
+  return(id_and_counts)
+}
+
+df1 <- get_counts(Ovcar4Parental1)
+df2 <- get_counts(Ovcar4Parental2)
+df3 <- get_counts(Ovcar4Parental3)
+df4 <- get_counts(Ov4Carbopool1)
+df5 <- get_counts(Ov4Carbopool2)
+df6 <- get_counts(Ov4Carbopool3)
+
+```
+
+
+
+```{r}
+# Merging all data sets by "gene_id" column 
+
+rawCounts <- list(df1, df2, df3, df4, df5 ,df6) %>% 
+                reduce(inner_join, by='gene_id')
+
+```
+
+
+**Differential Expression Analysis**
+
+```{r error = FALSE}
+if (!require("BiocManager", quietly = TRUE)) 
+  install.packages("BiocManager") 
+  BiocManager::install("DESeq2")
+
+library("DESeq2")
+
+```
+
+
+
+```{r}
+# Tidying up the data for DESeq2
+
+rownames(rawCounts) <- rawCounts$gene_id
+
+rawCounts <-  select(rawCounts, -1)
+
+rawCounts <- ceiling(rawCounts) # converting floats to int for DESeq2
+
+head(rawCounts)
+
+```
+
+
+
+```{r}
+# Inputting - Sample Groups
+
+sampleData <- read.delim("sample_IDs.csv", header = T)
+
+sampleData <- sampleData %>% 
+      separate(sample.name.group, c("sample.name", "group"))
+
+head(sampleData)
+```
+
+
+
+```{r}
+# Creating DESeq2 object
+
+dds <- DESeqDataSetFromMatrix(countData = rawCounts,
+                              colData = sampleData,
+                              design = ~ group)
+
+dds
+```
+
+
+```{r}
+# Filtering out low count genes - allowing 10 counts in at least 3 samples
+
+keep <- rowSums(counts(dds) >= 10) >= 3
+
+dds <- dds[keep,]
+
+```
+
+
+
+```{r}
+# Running DESeq2 algo
+
+dds <- DESeq(dds)
+
+```
+
+
+```{r}
+# Using unsupervised clustering to see the relationship among two groups
+
+# Data normalization
+
+norm.counts <- counts(dds, normalized=TRUE)
+
+write.csv(norm.counts, file="normalized_counts.txt", row.names=TRUE)
+
+head(norm.counts)
+
+# Data transformation (using variance stabilizing transformations (VST) which produces transformed data on the log2 scale, normalized with respect to library size)
+
+vsd <- vst(dds, blind=FALSE)
+
+head(assay(vsd))
+```
+
+
+
+```{r}
+# Hierarchical clustering (dendrogram)
+
+sampleDists <- dist(t(assay(vsd)))
+plot(hclust(sampleDists, method = "complete"))
+
+```
+
+
+
+```{r}
+# PCA
+
+plotPCA(vsd, intgroup=c("group"))
+```
+
+
+
+```{r}
+# Getting the results of differential expression analysis
+
+res <- results(dds, contrast=c("group", "sensitive", "resistant"))
+
+# Viewing summary of results
+
+summary(res)
+#head(res)
+#mcols(res)$description
+```
+
+
+```{r}
+# Diagnostics - observing how well the data has been captured by the model (plotting Dispersion Estimates)
+
+plotDispEsts(dds)
+
+```
+
+
+```{r}
+# Graphical Visualizations of the DE genes – MA plot (shows the log2 fold changes of the genes (each dot is a gene) over the mean of normalized counts for all samples in our my data)
+
+plotMA(res)
+
+```
+Positive log2 fold changes values represent upregulated genes in sensitive compared to resistant group 
+Negative log2 fold changes values represent dowregulated genes in sensitive compared to resistant group 
+
+
+```{r}
+
+# Graphical Visualizations of the differentially expressed genes, subseting the DE genes with padj < 0.05 and log2FC > |1| i.e. at least two-fold change in expression
+
+library(pheatmap)
+
+de.sign <- subset(res, padj < 0.05 & abs(log2FoldChange) >1 )
+
+de.sign.genes <- rownames(de.sign)
+
+scale.dat <- t(scale(t(assay(vsd)[de.sign.genes,])))
+
+pheatmap(scale.dat[de.sign.genes,], cluster_rows=TRUE, show_rownames=FALSE, cluster_cols=TRUE)
+
+```
+
+
+```{r}
+# Annotation of output tables 
+
+BiocManager::install('AnnotationDbi')
+library(AnnotationDbi)
+library(org.Hs.eg.db)
+
+
+res.df <- as.data.frame(res)
+
+res.annot <- mapIds(org.Hs.eg.db, keys = rownames(res.df), keytype = "ENSEMBL", column = "SYMBOL")
+
+res.df.annot <- cbind(res.df,gene.symbol = res.annot) #binding the annotations to the sign.df
+
+head(res.df.annot)
+
+write.csv(res.df.annot, file = "DE_sensitiveVSresistant_results_wGeneSymbol.csv")
+
+```
+
+
+```{r}
+
+# Using volcano plot to visualize the Log2Fold changes of all genes (again each dot represents a gene) plotted against the -Log10 Adjusted pvalue.
+# In red are genes with padj < 0.05 and log2fold change more or less than 1. They are either differently upregulated (right) or downregulated (left) in sensitive samples compare to resistant.
+
+BiocManager::install('EnhancedVolcano')
+library(EnhancedVolcano)
+
+
+EnhancedVolcano(res.df.annot,
+    lab = res.df.annot$gene.symbol,
+    x = 'log2FoldChange',
+    y = 'padj')
+
+```
+
+
+**Gene set enrichment analysis**
+
+```{r}
+# Performing Pre-Ranked Gene Set Enrichment Analysis (GSEA Pre-Ranked) to understand better what biological processes and pathways are affected 
+
+library(fgsea)
+
+library(data.table)
+
+library(ggplot2)
+
+library(qusage)
+```
+
+
+
+```{r}
+# Loading DE results
+
+DE.res <- read.csv("DE_sensitiveVSresistant_results_wGeneSymbol.csv", header = TRUE, row.names = 1)
+DE.res
+```
+
+
+```{r}
+# Loading the Gene Ontology Collection
+
+gmt.file <- read.gmt("c5.go.bp.v7.4.symbols.gmt")
+```
+
+
+
+```{r}
+# Ranking DE results by decreasing Log2 Fold-change and then creating a named vector of the log2 fold changes with the names being the gene symbols.
+
+DE.res.ranked <- DE.res[order(DE.res$log2FoldChange, decreasing = T), ]
+
+DE.ranks <- setNames(DE.res.ranked$log2FoldChange, DE.res.ranked$gene.symbol)
+```
+
+
+
+```{r}
+# Running the fgsea function
+
+fgseaRes <- fgsea(gmt.file, DE.ranks, minSize=15, maxSize=500)
+head(fgseaRes)
+
+```
+
+
+```{r}
+# ordered from most sign. to least 
+
+topPathways <- fgseaRes[order(padj)]
+
+topPathways
+```
+
+
+**Pathway Enrichment Analysis**
+
+```{r}
+# selecting sign. DE genes
+
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+
+
+# adding symbol column for further pathway analysis
+
+res$symbol = mapIds(org.Hs.eg.db,
+                    keys=row.names(res), 
+                    column="SYMBOL",
+                    keytype="ENSEMBL",
+                    multiVals="first")
+
+sig_genes <- res[res$padj <= 0.05 & !is.na(res$padj), "symbol"]
+
+print(paste("Total number of significant genes:", length(sig_genes)))
+
+```
+
+
+```{r}
+write.table(sig_genes, file="significant_genes.txt", row.names=FALSE, col.names=FALSE, quote=FALSE)
+```
+
+
+Performing pathway analysis online where I uploaded "significant_genes.txt" to Reactome website (https://reactome.org/PathwayBrowser/#TOOL=AT). Selectied parameters:“Project to Humans”
+```{r}
+reactome_res <- read.csv("reactome_result.csv")
+reactome_res
+```
+
+
+```{r}
+# top dysregulated pathways
+
+reactome_res %>% dplyr::select(2, 6)
+```
+**Gene Ontology Biological Pathways (GOBP) related to the tumor micro-environment, particularly the extracellular matrix, were enriched in carboplatin-resistant cells**
+
+
