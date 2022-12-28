@@ -6,9 +6,7 @@
 
 **About Data**:<br/>
 RNA-seq data from Human HGSC (high grade serous ovarian cancer) cell line - OVCAR4.<br/>
-Data split into 2 groups (3 samples each): carboplatin-resistant vs carboplatin-sensitive.
-
-**Data Sets**:<br/>
+Data split into 2 groups (3 samples each): carboplatin-resistant vs carboplatin-sensitive.<br/>
 Libraries were sequenced to a target coverage of 50 × on Illumina's HiSeq 4000 (2 x 75 bp paired end reads).<br/> 
 In total there are 12 raw FASTQ files (2 for each sample).
 
