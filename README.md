@@ -36,6 +36,12 @@ Gene Ontology Biological Pathways (GOBP) related to the tumor micro-environment,
 *Samples IDs:*<br/>
 sample_IDs.csv
 
+*Array jobs in bash:*
+QC_job.sh<br/>
+trim_job.sh<br/>
+STAR_job.sh<br/>
+bam_job.sh<br/>
+
 *Raw gene counts from rsem analysis:*<br/>
 WTCHG_626197_201106_.genes.results<br/>
 WTCHG_626197_289105_.genes.results<br/>
