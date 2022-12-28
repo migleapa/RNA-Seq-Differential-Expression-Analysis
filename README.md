@@ -6,9 +6,9 @@
 
 **About Data**:<br/>
 RNA-seq data from Human HGSC (high grade serous ovarian cancer) cell line - OVCAR4.<br/>
-Data split into 2 groups (3 samples each): carboplatin-resistant vs carboplatin-sensitive.<br/>
 Libraries were sequenced to a target coverage of 50 × on Illumina's HiSeq 4000 (2 x 75 bp paired end reads).<br/> 
-In total there are 12 raw FASTQ files (2 for each sample).
+Data split into 2 groups (3 samples each): carboplatin-resistant vs carboplatin-sensitive.<br/>
+In total there were 12 raw FASTQ files (2 for each sample). 
 
 **Objective**:<br/>
 Investigate the changes in gene expression and effects on Gene Ontology Biological Pathways (GOBP) in carboplatin-resistant samples compared to carboplatin-sensitive.
@@ -31,3 +31,18 @@ Performing pathway analysis using online tool Reactome.
 **Results:**<br/>
 Gene Ontology Biological Pathways (GOBP) related to the tumor micro-environment, particularly the extracellular matrix, were enriched in carboplatin-resistant cells
 
+**Data sets provided**:<br/>
+
+*Samples IDs:*<br/>
+sample_IDs.csv
+
+*Raw gene counts from rsem analysis:*<br/>
+WTCHG_626197_201106_.genes.results<br/>
+WTCHG_626197_289105_.genes.results<br/>
+WTCHG_626197_290117_.genes.results<br/>
+WTCHG_626197_291129_.genes.results<br/>
+WTCHG_626197_295177_.genes.results<br/>
+WTCHG_626197_296189_.genes.results
+
+*Pathway analysis with Reactome:*<br/>
+reactome_result.csv<br/>
